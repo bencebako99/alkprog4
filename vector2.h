@@ -1,4 +1,7 @@
 //template <typename T>
+#include <sstream>
+#include <fstream>
+#include <string>
 using namespace std;
 struct Vector2
 {
@@ -44,12 +47,24 @@ struct Vector2
     Vector2 normalize(Vector2 const& a){
         return Vector2{a.x/length(a), a.y/length(a)};
     }
-    ostream& operator << (ostream& o, Vector2 const& v){
-        o << v.x << "   " << v.y << endl;;
+    ostream& operator<<(ostream& o, Vector2 const& v){
+        o << v.x << "," << v.y << endl;;
         return o;
     }
     istream& operator>>(istream& i, Vector2& v){
-        i >> v.x;
-        i >> v.y;
+        const auto state = i.rdstate();
+        const auto pos = i.tellg();
+        string tmp;
+        getline(i, tmp);
+        if(tmp.size()>0){
+            stringstream ss(tmp);
+            getline(ss, tmp, ',');  v.x= stod(tmp);
+            getline(ss, tmp, ',');  v.y= stod(tmp);
+        }
+        else{
+            i.clear();
+            i.seekg(pos);
+            i.setstate(state);
+        }
         return i;
     }
